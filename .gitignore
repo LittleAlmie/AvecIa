@@ -1,0 +1,33 @@
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+.envrc
+
+# Caches Gradle / Kotlin
+.gradle/
+.kotlin/
+
+# IDE et éditeurs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Fichiers macOS / Windows
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Journaux et diagnostics Java
+*.log
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# Fichiers temporaires des éditeurs
+*~
+*.swp
+*.swo

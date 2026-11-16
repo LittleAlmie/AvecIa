@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: steamLookUpIA
+  config:
+    import: optional:file:.env[.properties]
+  main:
+    web-application-type: none
+    banner-mode: off
+logging:
+  level:
+    root: OFF
+steam:
+  api-key: ${STEAM_API_KEY:}

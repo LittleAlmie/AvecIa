@@ -1,0 +1,29 @@
+#!/bin/sh
+# Lanceur local : construit le JAR seulement si nécessaire.
+set -eu
+APP_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$APP_DIR"
+# Le Java du terminal peut être différent du toolchain Gradle.
+JAVA_EXEC="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+JAVA_VERSION=$("$JAVA_EXEC" -XshowSettings:properties -version 2>&1 | awk '/java.specification.version = / {print $3}')
+case "$JAVA_VERSION" in
+    ''|*[!0-9]*) JAVA_VERSION=0 ;;
+esac
+if [ "$JAVA_VERSION" -lt 25 ]; then
+    if [ -x /usr/libexec/java_home ] && JAVA_25=$(/usr/libexec/java_home -v 25 2>/dev/null); then
+        JAVA_HOME="$JAVA_25"
+        export JAVA_HOME
+        JAVA_EXEC="$JAVA_HOME/bin/java"
+    else
+        printf '\n  Java 25 est nécessaire pour Steam Lookup.\n  Installez un JDK 25 et configurez JAVA_HOME vers son dossier.\n\n' >&2
+        exit 2
+    fi
+fi
+JAR="build/libs/steamLookUpIA-0.0.1-SNAPSHOT.jar"
+if [ ! -f "$JAR" ] || [ build.gradle.kts -nt "$JAR" ] || [ settings.gradle.kts -nt "$JAR" ] \
+    || [ gradle/wrapper/gradle-wrapper.properties -nt "$JAR" ] \
+    || [ -n "$(find src/main -type f -newer "$JAR" -print -quit 2>/dev/null)" ]; then
+    printf '\n  Préparation de Steam Lookup…\n\n' >&2
+    ./gradlew --quiet --console=plain bootJar
+fi
+exec "$JAVA_EXEC" -jar "$JAR" "$@"
